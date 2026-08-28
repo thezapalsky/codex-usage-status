@@ -6,6 +6,7 @@ Display Codex quota status where it is visible at a glance:
 
 - 5-hour usage window
 - weekly usage window
+- optional GPT reserve weekly window
 - reset times
 - manual refresh state
 
@@ -36,8 +37,9 @@ The relevant response fields are:
 - `rateLimits.secondary.windowDurationMins`
 - `rateLimits.secondary.resetsAt`
 - `rateLimitsByLimitId.codex` when present
+- `rateLimitsByLimitId["gpt-reserve-limit"]` when present
 
-The UI displays remaining percent as `100 - usedPercent`.
+The UI displays remaining percent as `100 - usedPercent`. The reserve snapshot is normalized independently and rendered as an additional `RS` ring when available.
 
 ## Source layers
 
@@ -46,7 +48,7 @@ The native macOS app is intentionally split by responsibility:
 - `App/`: AppKit lifecycle, menu actions, refresh timing, and settings display.
 - `Codex/`: the only layer that starts `codex app-server --listen stdio://`.
 - `Domain/`: response decoding and remaining-quota normalization.
-- `UI/`: double-ring and large-readout badge rendering.
+- `UI/`: three-ring (when reserve is available) and large-readout badge rendering.
 
 ```mermaid
 flowchart LR

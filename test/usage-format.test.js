@@ -21,6 +21,14 @@ test("normalizes Codex 5-hour and weekly windows", () => {
           resetsAt: 1780500000,
         },
       },
+      "gpt-reserve-limit": {
+        limitId: "gpt-reserve-limit",
+        primary: {
+          usedPercent: 24,
+          windowDurationMins: 10080,
+          resetsAt: 1780600000,
+        },
+      },
     },
   });
 
@@ -28,7 +36,8 @@ test("normalizes Codex 5-hour and weekly windows", () => {
   assert.equal(usage.planType, "plus");
   assert.equal(usage.fiveHour.remainingPercent, 66);
   assert.equal(usage.weekly.remainingPercent, 63);
-  assert.equal(formatMenuTitle(usage), "Codex 5h 66% 7d 63%");
+  assert.equal(usage.reserveWeekly.remainingPercent, 76);
+  assert.equal(formatMenuTitle(usage), "Codex 5h 66% 7d 63% gpt-reserve 76%");
 });
 
 test("falls back to backward-compatible single snapshot", () => {

@@ -4,17 +4,18 @@ Small macOS menu-bar app for showing Codex usage at a glance.
 
 ![Codex Usage Status menu-bar badge](docs/assets/menu-bar-badge.png)
 
-It displays usage as a compact side-labeled double-ring badge:
+It displays usage as a compact side-labeled badge with a third ring when the optional GPT reserve window is available:
 
 - left ring group: 5-hour remaining percentage
-- right ring group: weekly remaining percentage
+- middle ring group: weekly remaining percentage
+- right ring group: GPT reserve weekly remaining percentage (`gpt-reserve-limit`)
 - ring progress: remaining quota status
 - ring center number: remaining percentage
-- side labels: `5H` and `7D`
+- side labels: `5H`, `7D`, and `RS`
 
 The menu-bar badge is the primary interface. Clicking it only exposes the necessary actions: Refresh, Settings, and Quit.
 
-Double Ring is the default display style. It uses no capsule background, and each label sits beside its own ring instead of inside the ring. A larger accessibility-oriented style is available from Display Style > Large Readout. Large Readout keeps the same two values visible in the menu bar, but prioritizes even larger readable numbers with weak `5H` / `7D` labels and thin status lines.
+Double Ring is the default display style. It uses no capsule background, and each label sits beside its own ring instead of inside the ring. A larger accessibility-oriented style is available from Display Style > Large Readout. Large Readout keeps the same values visible in the menu bar, but prioritizes even larger readable numbers with weak `5H` / `7D` / `RS` labels and thin status lines. If the Codex response does not include a reserve window, the `RS` ring shows `--`.
 
 ## Safety model
 
@@ -25,7 +26,7 @@ See [PRIVACY.md](PRIVACY.md) for the user-facing privacy summary and [SECURITY.m
 ## Requirements
 
 - macOS 13 or later
-- Codex desktop installed at `/Applications/Codex.app`
+- Codex desktop installed with its `codex` executable available (this checkout defaults to `/Applications/ChatGPT.app/Contents/Resources/codex`)
 - You are already signed in to Codex
 
 ## Install from release
@@ -43,9 +44,10 @@ Unsigned GitHub builds may trigger macOS Gatekeeper warnings. For a public polis
 
 ## Known limitations
 
-- Codex desktop must be installed at `/Applications/Codex.app`, unless `CODEX_BIN` is set for development.
+- The default Codex executable path is `/Applications/ChatGPT.app/Contents/Resources/codex`; set `CODEX_BIN` if your installation uses another path.
 - You must already be signed in to Codex.
 - Live usage depends on Codex's local app-server method `account/rateLimits/read`; if that local interface changes, this app may need an update.
+- The GPT reserve ring appears only when the response includes a `gpt-reserve-limit` snapshot.
 - The app shows usage only. It cannot buy credits, switch accounts, retry login, or change limits.
 - Local builds are ad-hoc signed by default. Downloaded release ZIPs may show Gatekeeper warnings until a notarized build is available.
 

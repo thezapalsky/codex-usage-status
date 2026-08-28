@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 
-const DEFAULT_CODEX_BIN = "/Applications/Codex.app/Contents/Resources/codex";
+const DEFAULT_CODEX_BIN = "/Applications/ChatGPT.app/Contents/Resources/codex";
 const DEFAULT_TIMEOUT_MS = 20_000;
 
 export class AppServerClient {

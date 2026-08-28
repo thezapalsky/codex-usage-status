@@ -22,6 +22,7 @@ struct UsageSummary: Sendable {
     let planType: String?
     let fiveHour: UsageWindow
     let weekly: UsageWindow
+    let reserveWeekly: UsageWindow?
 
     init(response: RateLimitsResponse) throws {
         let snapshot = response.rateLimitsByLimitId?["codex"]
@@ -43,20 +44,53 @@ struct UsageSummary: Sendable {
         self.planType = snapshot.planType
         self.fiveHour = fiveHour
         self.weekly = weekly
+
+        if let reserveSnapshot = response.rateLimitsByLimitId?["gpt-reserve-limit"] {
+            let reserveWindows = [reserveSnapshot.primary, reserveSnapshot.secondary]
+                .compactMap { $0 }
+                .map(UsageWindow.init)
+            self.reserveWeekly = reserveWindows.first { approximately($0.windowDurationMins, 10080) }
+                ?? reserveWindows.first
+        } else {
+            self.reserveWeekly = nil
+        }
     }
 
     var menuTitle: String {
-        "5h \(fiveHour.remainingPercent)% 7d \(weekly.remainingPercent)%"
+        var parts = [
+            "5h \(fiveHour.remainingPercent)%",
+            "7d \(weekly.remainingPercent)%",
+        ]
+        if let reserveWeekly {
+            parts.append("gpt-reserve \(reserveWeekly.remainingPercent)%")
+        }
+        return parts.joined(separator: " ")
     }
 
     var verboseTitle: String {
-        "Codex usage: 5-hour \(fiveHour.remainingPercent)% · weekly \(weekly.remainingPercent)%"
+        var parts = [
+            "Codex usage: 5-hour \(fiveHour.remainingPercent)%",
+            "weekly \(weekly.remainingPercent)%",
+        ]
+        if let reserveWeekly {
+            parts.append("GPT reserve weekly \(reserveWeekly.remainingPercent)%")
+        }
+        return parts.joined(separator: " · ")
     }
 
     func tooltip(formatter: DateFormatter) -> String {
         let fiveHourReset = fiveHour.resetsAt.map { formatter.string(from: $0) } ?? "unknown"
         let weeklyReset = weekly.resetsAt.map { formatter.string(from: $0) } ?? "unknown"
-        return "Codex usage\n5-hour remaining: \(fiveHour.remainingPercent)% · resets \(fiveHourReset)\nWeekly remaining: \(weekly.remainingPercent)% · resets \(weeklyReset)"
+        var lines = [
+            "Codex usage",
+            "5-hour remaining: \(fiveHour.remainingPercent)% · resets \(fiveHourReset)",
+            "Weekly remaining: \(weekly.remainingPercent)% · resets \(weeklyReset)",
+        ]
+        if let reserveWeekly {
+            let reserveReset = reserveWeekly.resetsAt.map { formatter.string(from: $0) } ?? "unknown"
+            lines.append("GPT reserve weekly remaining: \(reserveWeekly.remainingPercent)% · resets \(reserveReset)")
+        }
+        return lines.joined(separator: "\n")
     }
 }
 

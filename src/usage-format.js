@@ -1,5 +1,6 @@
 const FIVE_HOURS_MINS = 5 * 60;
 const WEEK_MINS = 7 * 24 * 60;
+const RESERVE_LIMIT_ID = "gpt-reserve-limit";
 
 export function normalizeUsage(rateLimitResponse, now = new Date()) {
   const snapshot =
@@ -17,12 +18,23 @@ export function normalizeUsage(rateLimitResponse, now = new Date()) {
 
   const fiveHour = windows.find((window) => approximately(window.windowDurationMins, FIVE_HOURS_MINS));
   const weekly = windows.find((window) => approximately(window.windowDurationMins, WEEK_MINS));
+  const reserveSnapshot = rateLimitResponse?.rateLimitsByLimitId?.[RESERVE_LIMIT_ID];
+  const reserveWindows = reserveSnapshot
+    ? [reserveSnapshot.primary, reserveSnapshot.secondary]
+        .filter(Boolean)
+        .map((window) => normalizeWindow(window, now))
+    : [];
+  const reserveWeekly =
+    reserveWindows.find((window) => approximately(window.windowDurationMins, WEEK_MINS)) ??
+    reserveWindows[0] ??
+    null;
 
   return {
     limitId: snapshot.limitId ?? "codex",
     planType: snapshot.planType ?? null,
     fiveHour: fiveHour ?? windows[0] ?? null,
     weekly: weekly ?? windows[1] ?? null,
+    reserveWeekly,
     windows,
   };
 }
@@ -34,6 +46,9 @@ export function formatMenuTitle(usage) {
   }
   if (usage.weekly) {
     parts.push(`7d ${usage.weekly.remainingPercent}%`);
+  }
+  if (usage.reserveWeekly) {
+    parts.push(`gpt-reserve ${usage.reserveWeekly.remainingPercent}%`);
   }
   return parts.length > 0 ? `Codex ${parts.join(" ")}` : "Codex usage";
 }
@@ -47,6 +62,10 @@ export function formatTextStatus(usage) {
   if (usage.weekly) {
     lines.push(`Weekly remaining: ${usage.weekly.remainingPercent}%`);
     lines.push(`Weekly reset: ${formatReset(usage.weekly.resetsAt)}`);
+  }
+  if (usage.reserveWeekly) {
+    lines.push(`GPT reserve weekly remaining: ${usage.reserveWeekly.remainingPercent}%`);
+    lines.push(`GPT reserve weekly reset: ${formatReset(usage.reserveWeekly.resetsAt)}`);
   }
   return lines.join("\n");
 }

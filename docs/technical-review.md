@@ -7,7 +7,7 @@ The app is intentionally split into two pieces:
 - Native macOS UI: AppKit status item in `macos/CodexUsageStatus`.
 - Probe/test layer: Node client and formatter tests in `src/` and `test/`.
 
-The production app does not need Node at runtime. It directly spawns:
+The production app does not need Node at runtime. It directly spawns the installed Codex executable (this checkout defaults to `/Applications/ChatGPT.app/Contents/Resources/codex`):
 
 ```sh
 /Applications/Codex.app/Contents/Resources/codex app-server --listen stdio://
@@ -25,13 +25,13 @@ Patching the packaged Codex desktop bundle breaks signing and ASAR integrity ass
 
 ## Menu-bar display
 
-The default menu-bar display is a side-labeled double-ring badge.
+The default menu-bar display is a side-labeled badge with a third ring when the optional GPT reserve window is available.
 
-The left ring group represents the 5-hour window and the right ring group represents the 7-day weekly window. Each label sits beside its own ring rather than inside the ring, so the ring center only has to carry the remaining percentage number. The `5H` and `7D` labels are stacked into matching two-character micro-labels for visual balance. The badge intentionally avoids a capsule background so it feels like a native lightweight menu-bar status item instead of a separate floating control.
+The left ring group represents the 5-hour window, the middle ring group represents the 7-day weekly window, and the right ring group represents the GPT reserve weekly window. Each label sits beside its own ring rather than inside the ring, so the ring center only has to carry the remaining percentage number. The `5H`, `7D`, and `RS` labels are stacked into matching two-character micro-labels for visual balance. The badge intentionally avoids a capsule background so it feels like a native lightweight menu-bar status item instead of a separate floating control.
 
-This keeps the menu-bar footprint narrow while making the two quota windows visually distinct. The click menu is intentionally minimal: Refresh, Settings, and Quit.
+This keeps the menu-bar footprint compact while making the quota windows visually distinct. The click menu is intentionally minimal: Refresh, Settings, and Quit.
 
-The optional Large Readout style is designed for readability. It uses larger monospaced numbers as the primary visual layer, keeps `5H` / `7D` as weak labels, and moves status expression into subtle bottom lines. It also avoids the capsule background.
+The optional Large Readout style is designed for readability. It uses larger monospaced numbers as the primary visual layer, keeps `5H` / `7D` / `RS` as weak labels, and moves status expression into subtle bottom lines. It also avoids the capsule background.
 
 ## Refresh behavior
 
@@ -46,7 +46,7 @@ Refresh is intentionally conservative:
 
 ## Known limitations
 
-- The app assumes Codex is installed at `/Applications/Codex.app` unless `CODEX_BIN` is set.
+- The app assumes the Codex executable is bundled at `/Applications/ChatGPT.app/Contents/Resources/codex` unless `CODEX_BIN` is set.
 - Public release builds should be Developer ID signed and notarized.
 - The menu-bar companion cannot draw inside the official Codex desktop window. That requires an upstream Codex desktop change.
 

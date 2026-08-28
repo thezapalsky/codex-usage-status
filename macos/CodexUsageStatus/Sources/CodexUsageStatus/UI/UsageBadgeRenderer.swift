@@ -1,15 +1,15 @@
 import AppKit
 
 enum UsageBadgeRenderer {
-    private static let doubleRingImageSize = NSSize(width: 86, height: 24)
-    private static let largeReadoutImageSize = NSSize(width: 86, height: 24)
+    private static let doubleRingImageSize = NSSize(width: 134, height: 24)
+    private static let largeReadoutImageSize = NSSize(width: 134, height: 24)
 
     static func statusItemLength(for style: BadgeStyle) -> CGFloat {
         switch style {
         case .doubleRing:
-            return 90
+            return 138
         case .largeReadout:
-            return 90
+            return 138
         }
     }
 
@@ -17,6 +17,7 @@ enum UsageBadgeRenderer {
         render(style: style,
             left: BadgeValue(label: "5H", percent: usage.fiveHour.remainingPercent),
             right: BadgeValue(label: "7D", percent: usage.weekly.remainingPercent),
+            reserve: BadgeValue(label: "RS", percent: usage.reserveWeekly?.remainingPercent),
             appearance: appearance
         )
     }
@@ -25,6 +26,7 @@ enum UsageBadgeRenderer {
         render(style: style,
             left: BadgeValue(label: "5H", percent: nil),
             right: BadgeValue(label: "7D", percent: nil),
+            reserve: BadgeValue(label: "RS", percent: nil),
             appearance: appearance
         )
     }
@@ -33,6 +35,7 @@ enum UsageBadgeRenderer {
         render(style: style,
             left: BadgeValue(label: "5H", percent: nil, overrideText: "?"),
             right: BadgeValue(label: "7D", percent: nil, overrideText: "?"),
+            reserve: BadgeValue(label: "RS", percent: nil, overrideText: "?"),
             appearance: appearance,
             forcedColor: .systemRed
         )
@@ -42,20 +45,22 @@ enum UsageBadgeRenderer {
         style: BadgeStyle,
         left: BadgeValue,
         right: BadgeValue,
+        reserve: BadgeValue,
         appearance: NSAppearance,
         forcedColor: NSColor? = nil
     ) -> NSImage {
         switch style {
         case .doubleRing:
-            return renderDoubleRing(left: left, right: right, appearance: appearance, forcedColor: forcedColor)
+            return renderDoubleRing(left: left, right: right, reserve: reserve, appearance: appearance, forcedColor: forcedColor)
         case .largeReadout:
-            return renderLargeReadout(left: left, right: right, appearance: appearance, forcedColor: forcedColor)
+            return renderLargeReadout(left: left, right: right, reserve: reserve, appearance: appearance, forcedColor: forcedColor)
         }
     }
 
     private static func renderDoubleRing(
         left: BadgeValue,
         right: BadgeValue,
+        reserve: BadgeValue,
         appearance: NSAppearance,
         forcedColor: NSColor?
     ) -> NSImage {
@@ -71,11 +76,13 @@ enum UsageBadgeRenderer {
 
             let divider = NSBezierPath()
             divider.appendArc(withCenter: NSPoint(x: 43, y: 12), radius: 1.0, startAngle: 0, endAngle: 360)
+            divider.appendArc(withCenter: NSPoint(x: 89, y: 12), radius: 1.0, startAngle: 0, endAngle: 360)
             NSColor.labelColor.withAlphaComponent(0.22).setFill()
             divider.fill()
 
             drawLabeledRing(value: left, labelRect: NSRect(x: 1, y: 4.0, width: 11, height: 16), ringCenter: NSPoint(x: 29, y: 12), forcedColor: forcedColor)
-            drawLabeledRing(value: right, labelRect: NSRect(x: 50, y: 4.0, width: 11, height: 16), ringCenter: NSPoint(x: 75, y: 12), forcedColor: forcedColor)
+            drawLabeledRing(value: right, labelRect: NSRect(x: 48, y: 4.0, width: 11, height: 16), ringCenter: NSPoint(x: 75, y: 12), forcedColor: forcedColor)
+            drawLabeledRing(value: reserve, labelRect: NSRect(x: 95, y: 4.0, width: 11, height: 16), ringCenter: NSPoint(x: 122, y: 12), forcedColor: forcedColor)
         }
 
         image.isTemplate = false
@@ -85,6 +92,7 @@ enum UsageBadgeRenderer {
     private static func renderLargeReadout(
         left: BadgeValue,
         right: BadgeValue,
+        reserve: BadgeValue,
         appearance: NSAppearance,
         forcedColor: NSColor?
     ) -> NSImage {
@@ -100,11 +108,13 @@ enum UsageBadgeRenderer {
 
             let divider = NSBezierPath()
             divider.appendArc(withCenter: NSPoint(x: 43, y: 12), radius: 1.0, startAngle: 0, endAngle: 360)
+            divider.appendArc(withCenter: NSPoint(x: 90, y: 12), radius: 1.0, startAngle: 0, endAngle: 360)
             NSColor.labelColor.withAlphaComponent(0.28).setFill()
             divider.fill()
 
             drawReadoutGroup(value: left, labelRect: NSRect(x: 1, y: 4.0, width: 11, height: 16), numberRect: NSRect(x: 15, y: 3.4, width: 25, height: 17), lineRect: NSRect(x: 1, y: 2.4, width: 36, height: 1.5), forcedColor: forcedColor)
-            drawReadoutGroup(value: right, labelRect: NSRect(x: 49, y: 4.0, width: 11, height: 16), numberRect: NSRect(x: 61, y: 3.4, width: 25, height: 17), lineRect: NSRect(x: 48, y: 2.4, width: 36, height: 1.5), forcedColor: forcedColor)
+            drawReadoutGroup(value: right, labelRect: NSRect(x: 48, y: 4.0, width: 11, height: 16), numberRect: NSRect(x: 61, y: 3.4, width: 25, height: 17), lineRect: NSRect(x: 48, y: 2.4, width: 36, height: 1.5), forcedColor: forcedColor)
+            drawReadoutGroup(value: reserve, labelRect: NSRect(x: 95, y: 4.0, width: 11, height: 16), numberRect: NSRect(x: 108, y: 3.4, width: 25, height: 17), lineRect: NSRect(x: 95, y: 2.4, width: 36, height: 1.5), forcedColor: forcedColor)
         }
 
         image.isTemplate = false

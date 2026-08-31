@@ -15,7 +15,7 @@ It displays usage as a compact side-labeled badge with a third ring when the opt
 
 The menu-bar badge is the primary interface. Clicking it only exposes the necessary actions: Refresh, Settings, and Quit.
 
-Double Ring is the default display style. It uses no capsule background, and each label sits beside its own ring instead of inside the ring. A larger accessibility-oriented style is available from Display Style > Large Readout. Large Readout keeps the same values visible in the menu bar, but prioritizes even larger readable numbers with weak `5H` / `7D` / `RS` labels and thin status lines. If the Codex response does not include a reserve window, the `RS` ring shows `--`.
+Double Ring is the default display style. It uses no capsule background, and each label sits beside its own ring instead of inside the ring. A larger accessibility-oriented style is available from Display Style > Large Readout. Large Readout keeps the same values visible in the menu bar, but prioritizes even larger readable numbers with weak `5H` / `7D` / `RS` labels and thin status lines. If the Codex response does not include a reserve window, the `RS` group is hidden and the badge returns to its compact two-ring width.
 
 ## Safety model
 

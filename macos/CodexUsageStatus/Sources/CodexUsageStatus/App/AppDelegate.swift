@@ -176,7 +176,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func renderCurrentBadge() {
-        statusItem.length = UsageBadgeRenderer.statusItemLength(for: badgeStyle)
+        let showsReserve = lastError == nil && lastUsage?.reserveWeekly != nil
+        statusItem.length = UsageBadgeRenderer.statusItemLength(for: badgeStyle, showsReserve: showsReserve)
         if let button = statusItem.button {
             button.title = ""
 

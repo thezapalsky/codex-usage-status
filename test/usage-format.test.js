@@ -57,6 +57,8 @@ test("falls back to backward-compatible single snapshot", () => {
 
   assert.equal(usage.fiveHour.remainingPercent, 100);
   assert.equal(usage.weekly.remainingPercent, 0);
+  assert.equal(usage.reserveWeekly, null);
+  assert.equal(formatMenuTitle(usage), "Codex 5h 100% 7d 0%");
 });
 
 test("redacts sensitive app-server stderr snippets", () => {

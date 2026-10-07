@@ -7,10 +7,10 @@ The app is intentionally split into two pieces:
 - Native macOS UI: AppKit status item in `macos/CodexUsageStatus`.
 - Probe/test layer: Node client and formatter tests in `src/` and `test/`.
 
-The production app does not need Node at runtime. It directly spawns the Codex executable bundled with ChatGPT, checking the current path first and the legacy path second:
+The production app does not need Node at runtime. It directly spawns the installed Codex executable. Discovery keeps the original Codex desktop path first, then checks the current and legacy ChatGPT bundle paths. `CODEX_BIN` takes precedence over discovery:
 
 ```sh
-/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex app-server --listen stdio://
+/Applications/Codex.app/Contents/Resources/codex app-server --listen stdio://
 ```
 
 Then it sends the official JSON-RPC method:
@@ -46,7 +46,7 @@ Refresh is intentionally conservative:
 
 ## Known limitations
 
-- The app checks the current and legacy ChatGPT bundle paths. Set `CODEX_BIN` if the executable is installed elsewhere.
+- The app checks bundled executables in `/Applications/Codex.app` and `/Applications/ChatGPT.app`. Set `CODEX_BIN` for other installation locations.
 - Public release builds should be Developer ID signed and notarized.
 - The menu-bar companion cannot draw inside the official Codex desktop window. That requires an upstream Codex desktop change.
 

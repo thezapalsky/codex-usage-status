@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 import { accessSync, constants } from "node:fs";
 import { createInterface } from "node:readline";
 
-export const DEFAULT_CODEX_BINS = [
+const DEFAULT_CODEX_BINS = [
+  "/Applications/Codex.app/Contents/Resources/codex",
   "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
   "/Applications/ChatGPT.app/Contents/Resources/codex",
 ];
@@ -19,9 +20,8 @@ function isExecutable(filePath) {
 
 export function resolveCodexBin(options = {}) {
   const environment = options.env ?? process.env;
-  const override = environment.CODEX_BIN;
-  if (override) {
-    return override;
+  if (environment.CODEX_BIN) {
+    return environment.CODEX_BIN;
   }
 
   const candidates = options.candidates ?? DEFAULT_CODEX_BINS;

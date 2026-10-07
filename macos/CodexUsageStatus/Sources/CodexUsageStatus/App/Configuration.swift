@@ -2,6 +2,7 @@ import Foundation
 
 enum AppConfig {
     static let defaultCodexPaths = [
+        "/Applications/Codex.app/Contents/Resources/codex",
         "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
         "/Applications/ChatGPT.app/Contents/Resources/codex"
     ]

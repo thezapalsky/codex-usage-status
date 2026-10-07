@@ -1,12 +1,37 @@
 import { spawn } from "node:child_process";
+import { accessSync, constants } from "node:fs";
 import { createInterface } from "node:readline";
 
-const DEFAULT_CODEX_BIN = "/Applications/Codex.app/Contents/Resources/codex";
+const DEFAULT_CODEX_BINS = [
+  "/Applications/Codex.app/Contents/Resources/codex",
+  "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+  "/Applications/ChatGPT.app/Contents/Resources/codex",
+];
 const DEFAULT_TIMEOUT_MS = 20_000;
+
+function isExecutable(filePath) {
+  try {
+    accessSync(filePath, constants.X_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function resolveCodexBin(options = {}) {
+  const environment = options.env ?? process.env;
+  if (environment.CODEX_BIN) {
+    return environment.CODEX_BIN;
+  }
+
+  const candidates = options.candidates ?? DEFAULT_CODEX_BINS;
+  const executableCheck = options.isExecutable ?? isExecutable;
+  return candidates.find(executableCheck) ?? candidates[0];
+}
 
 export class AppServerClient {
   constructor(options = {}) {
-    this.codexBin = options.codexBin ?? process.env.CODEX_BIN ?? DEFAULT_CODEX_BIN;
+    this.codexBin = options.codexBin ?? resolveCodexBin();
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.nextId = 1;
     this.pending = new Map();

@@ -14,7 +14,7 @@ enum CodexUsageFetcher {
     }
 
     private static func readRateLimits() throws -> RateLimitsResponse {
-        let codexPath = ProcessInfo.processInfo.environment["CODEX_BIN"] ?? AppConfig.defaultCodexPath
+        let codexPath = AppConfig.codexPath()
         guard FileManager.default.isExecutableFile(atPath: codexPath) else {
             throw FetchError.codexNotFound(codexPath)
         }

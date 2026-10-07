@@ -25,7 +25,7 @@ See [PRIVACY.md](PRIVACY.md) for the user-facing privacy summary and [SECURITY.m
 ## Requirements
 
 - macOS 13 or later
-- Codex desktop installed at `/Applications/Codex.app`
+- Codex or ChatGPT desktop installed in `/Applications`, with its bundled `codex` executable available
 - You are already signed in to Codex
 
 ## Install from release
@@ -43,7 +43,7 @@ Unsigned GitHub builds may trigger macOS Gatekeeper warnings. For a public polis
 
 ## Known limitations
 
-- Codex desktop must be installed at `/Applications/Codex.app`, unless `CODEX_BIN` is set for development.
+- Executable discovery checks `/Applications/Codex.app/Contents/Resources/codex` first, then ChatGPT's current `Contents/Resources/codex-cli/bin/codex` and legacy `Contents/Resources/codex` paths. Set `CODEX_BIN` if your installation uses another location.
 - You must already be signed in to Codex.
 - Live usage depends on Codex's local app-server method `account/rateLimits/read`; if that local interface changes, this app may need an update.
 - The app shows usage only. It cannot buy credits, switch accounts, retry login, or change limits.

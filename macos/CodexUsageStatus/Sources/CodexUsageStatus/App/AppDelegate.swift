@@ -6,6 +6,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
 
+    private let fiveHourResetItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+    private let weeklyResetItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+    private let resetSeparator = NSMenuItem.separator()
+    private let resetFont = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
+
     private let refreshItem = NSMenuItem(title: "Refresh", action: #selector(refreshFromMenu), keyEquivalent: "r")
     private let displayStyleItem = NSMenuItem(title: "Display Style", action: nil, keyEquivalent: "")
     private let displayStyleMenu = NSMenu()
@@ -29,6 +34,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return formatter
     }()
 
+    private lazy var resetDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         statusItem.length = UsageBadgeRenderer.statusItemLength(for: badgeStyle)
@@ -38,6 +51,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.imagePosition = .imageOnly
             button.toolTip = "Codex usage: waiting for first refresh"
         }
+
+        fiveHourResetItem.isEnabled = false
+        weeklyResetItem.isEnabled = false
+        menu.addItem(fiveHourResetItem)
+        menu.addItem(weeklyResetItem)
+        menu.addItem(resetSeparator)
         renderCurrentBadge()
 
         refreshItem.target = self
@@ -176,10 +195,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func renderCurrentBadge() {
+        let now = Date()
         let showsReserve = lastError == nil && lastUsage?.reserveWeekly != nil
+        let resets = lastError == nil ? lastUsage?.exhaustedResets ?? [] : []
+        let resetText = lastError == nil ? lastUsage?.resetStatusText(now: now) ?? "" : ""
+        let title = resetText.isEmpty ? "" : "  \(resetText)"
+        let titleWidth = (title as NSString).size(withAttributes: [.font: resetFont]).width
         statusItem.length = UsageBadgeRenderer.statusItemLength(for: badgeStyle, showsReserve: showsReserve)
+            + (title.isEmpty ? 0 : ceil(titleWidth) + 8)
+
+        updateResetMenuItem(fiveHourResetItem, reset: resets.first { $0.label == "5h" }, now: now)
+        updateResetMenuItem(weeklyResetItem, reset: resets.first { $0.label == "7d" }, now: now)
+        resetSeparator.isHidden = resets.isEmpty
+
         if let button = statusItem.button {
-            button.title = ""
+            button.font = resetFont
+            button.title = title
+            button.imagePosition = title.isEmpty ? .imageOnly : .imageLeading
 
             if let lastError {
                 button.image = UsageBadgeRenderer.errorImage(style: badgeStyle, appearance: button.effectiveAppearance)
@@ -192,5 +224,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 button.toolTip = "Codex usage: waiting for first refresh"
             }
         }
+    }
+
+    private func updateResetMenuItem(_ item: NSMenuItem, reset: UsageResetInfo?, now: Date) {
+        item.isHidden = reset == nil
+        item.title = reset?.menuText(formatter: resetDateFormatter, now: now) ?? ""
     }
 }

@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: 24
       - run: npm test
+      - run: swift test --package-path macos/CodexUsageStatus
       - run: npm run build:macos
         env:
           BUILD_ARCH: ${{ matrix.arch }}

@@ -13,9 +13,11 @@ It displays usage as a compact side-labeled badge with a third ring when the opt
 - ring center number: remaining percentage
 - side labels: `5H`, `7D`, and `RS`
 
-The menu-bar badge is the primary interface. Clicking it only exposes the necessary actions: Refresh, Settings, and Quit.
+The menu-bar badge is the primary interface. Clicking it exposes Refresh, Display Style, Settings, and Quit, plus reset details when a limit is exhausted.
 
 Double Ring is the default display style. It uses no capsule background, and each label sits beside its own ring instead of inside the ring. A larger accessibility-oriented style is available from Display Style > Large Readout. Large Readout keeps the same values visible in the menu bar, but prioritizes even larger readable numbers with weak `5H` / `7D` / `RS` labels and thin status lines. If the Codex response does not include a reserve window, the `RS` group is hidden and the badge returns to its compact two-ring width.
+
+When the 5-hour or weekly allowance reaches 0%, a compact reset time appears beside the badge, such as `5h ↻ 15:00` or `7d ↻ Fri 09:00`. Times use your local time zone; resets on another day include the weekday. Clicking the badge shows the full reset date and time. Each exhausted window is listed separately, and the extra text disappears when quota becomes available again. Missing timestamps show `?`; expired timestamps show `pending` until Codex returns updated usage.
 
 ## Safety model
 
@@ -60,6 +62,7 @@ For source builds:
 
 ```sh
 npm test
+swift test --package-path macos/CodexUsageStatus
 npm run build:macos
 npm run start:macos
 ```

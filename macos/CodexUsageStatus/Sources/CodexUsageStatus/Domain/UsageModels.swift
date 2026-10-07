@@ -78,6 +78,22 @@ struct UsageSummary: Sendable {
         return parts.joined(separator: " · ")
     }
 
+    var exhaustedResets: [UsageResetInfo] {
+        var resets: [UsageResetInfo] = []
+        if fiveHour.remainingPercent == 0 {
+            resets.append(UsageResetInfo(label: "5h", title: "5-hour", resetsAt: fiveHour.resetsAt))
+        }
+        if weekly.remainingPercent == 0 {
+            resets.append(UsageResetInfo(label: "7d", title: "Weekly", resetsAt: weekly.resetsAt))
+        }
+        return resets
+    }
+
+    func resetStatusText(now: Date = Date(), calendar: Calendar = .current, locale: Locale = .current) -> String {
+        exhaustedResets.map { $0.compactText(now: now, calendar: calendar, locale: locale) }
+            .joined(separator: " · ")
+    }
+
     func tooltip(formatter: DateFormatter) -> String {
         let fiveHourReset = fiveHour.resetsAt.map { formatter.string(from: $0) } ?? "unknown"
         let weeklyReset = weekly.resetsAt.map { formatter.string(from: $0) } ?? "unknown"
@@ -91,6 +107,41 @@ struct UsageSummary: Sendable {
             lines.append("GPT reserve weekly remaining: \(reserveWeekly.remainingPercent)% · resets \(reserveReset)")
         }
         return lines.joined(separator: "\n")
+    }
+}
+
+struct UsageResetInfo: Sendable {
+    let label: String
+    let title: String
+    let resetsAt: Date?
+
+    func compactText(now: Date, calendar: Calendar, locale: Locale) -> String {
+        guard let resetsAt else {
+            return "\(label) ↻ ?"
+        }
+        guard resetsAt > now else {
+            return "\(label) ↻ pending"
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = calendar.timeZone
+        if calendar.isDate(resetsAt, inSameDayAs: now) {
+            formatter.timeStyle = .short
+        } else {
+            formatter.setLocalizedDateFormatFromTemplate("EEEjm")
+        }
+        return "\(label) ↻ \(formatter.string(from: resetsAt))"
+    }
+
+    func menuText(formatter: DateFormatter, now: Date) -> String {
+        guard let resetsAt else {
+            return "\(title) limit reached · reset time unavailable"
+        }
+        guard resetsAt > now else {
+            return "\(title) limit reached · waiting for updated reset time"
+        }
+        return "\(title) resets \(formatter.string(from: resetsAt))"
     }
 }
 

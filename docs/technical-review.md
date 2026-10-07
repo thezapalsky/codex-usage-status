@@ -29,7 +29,7 @@ The default menu-bar display is a side-labeled badge with a third ring when the 
 
 The left ring group represents the 5-hour window, the middle ring group represents the 7-day weekly window, and the right ring group represents the GPT reserve weekly window. Each label sits beside its own ring rather than inside the ring, so the ring center only has to carry the remaining percentage number. The `5H`, `7D`, and `RS` labels are stacked into matching two-character micro-labels for visual balance. The badge intentionally avoids a capsule background so it feels like a native lightweight menu-bar status item instead of a separate floating control.
 
-This keeps the menu-bar footprint compact while making the quota windows visually distinct. The click menu is intentionally minimal: Refresh, Settings, and Quit.
+This keeps the menu-bar footprint compact while making the quota windows visually distinct. When the 5-hour or weekly allowance is 0%, a compact local reset time appears alongside the badge. The click menu lists the full reset date and time for each exhausted window. Missing or expired reset timestamps are shown as unavailable or pending rather than guessed. The extra text disappears when quota returns or a refresh fails.
 
 The optional Large Readout style is designed for readability. It uses larger monospaced numbers as the primary visual layer, keeps `5H` / `7D` / `RS` as weak labels, and moves status expression into subtle bottom lines. It also avoids the capsule background.
 

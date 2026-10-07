@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { redactSensitive } from "../src/app-server-client.js";
+import { redactSensitive, resolveCodexBin } from "../src/app-server-client.js";
 import { formatMenuTitle, normalizeUsage } from "../src/usage-format.js";
 
 test("normalizes Codex 5-hour and weekly windows", () => {
@@ -76,4 +76,23 @@ test("redacts sensitive app-server stderr snippets", () => {
   assert.match(redacted, /api_key=\[redacted\]/);
   assert.match(redacted, /\[redacted-jwt\]/);
   assert.doesNotMatch(redacted, /should-not-survive|also-should-not-survive/);
+});
+
+test("uses an explicit Codex executable override", () => {
+  assert.equal(
+    resolveCodexBin({ env: { CODEX_BIN: "/custom/codex" } }),
+    "/custom/codex",
+  );
+});
+
+test("discovers the first executable bundled Codex candidate", () => {
+  const candidates = ["/current/codex", "/legacy/codex"];
+  assert.equal(
+    resolveCodexBin({
+      env: {},
+      candidates,
+      isExecutable: (candidate) => candidate === "/legacy/codex",
+    }),
+    "/legacy/codex",
+  );
 });

@@ -26,7 +26,7 @@ See [PRIVACY.md](PRIVACY.md) for the user-facing privacy summary and [SECURITY.m
 ## Requirements
 
 - macOS 13 or later
-- Codex desktop installed with its `codex` executable available (this checkout defaults to `/Applications/ChatGPT.app/Contents/Resources/codex`)
+- ChatGPT desktop installed with its bundled `codex` executable available
 - You are already signed in to Codex
 
 ## Install from release
@@ -44,7 +44,7 @@ Unsigned GitHub builds may trigger macOS Gatekeeper warnings. For a public polis
 
 ## Known limitations
 
-- The default Codex executable path is `/Applications/ChatGPT.app/Contents/Resources/codex`; set `CODEX_BIN` if your installation uses another path.
+- The app automatically checks the current ChatGPT bundle path (`Contents/Resources/codex-cli/bin/codex`) and its legacy `Contents/Resources/codex` path. Set `CODEX_BIN` if your installation uses another location.
 - You must already be signed in to Codex.
 - Live usage depends on Codex's local app-server method `account/rateLimits/read`; if that local interface changes, this app may need an update.
 - The GPT reserve ring appears only when the response includes a `gpt-reserve-limit` snapshot.
